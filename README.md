@@ -49,6 +49,12 @@ php /opt/nginx-manager/init.php --generate="password" --username="USERNAME2"
 
 both commands output password for you to save securely.
 
+> run via built-in php server
+
+```bash
+php -S domain.tld:50100 -c /opt/nginx-manager/php.ini -t /opt/nginx-manager/
+```
+
 
 ## Tasks for v1 Release
 
