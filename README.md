@@ -58,6 +58,7 @@ php -S domain.tld:50100 -c /opt/nginx-manager/php.ini -t /opt/nginx-manager/
 
 ## Tasks for v1 Release
 
+- [ ] Bash scripts will be adjusted to suit for CentOS
 - [ ] Test on Ubuntu 20.04
 - [ ] Test on Debian 10
 - [ ] Test on CentOS 8

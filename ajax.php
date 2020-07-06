@@ -24,6 +24,8 @@ $sectionMapper = [
 
     'get-home-stats' => 'getHomeStats',
     'recheck-home-stats' => 'recheckHomeStats',
+    'reload-service' => 'reloadService',
+    'restart-service' => 'restartService',
 
     'disable-domain' => 'disableDomain',
     'enable-domain' => 'enableDomain',
@@ -61,10 +63,9 @@ function needsUserLogin()
 
 function checkLogin()
 {
-    $username = strtolower($_POST['username']);
-    $password = $_POST['password'];
+    if (!empty($_POST['username']) && !empty($_POST['password'])) {
+        $username = strtolower($_POST['username']);
 
-    if ($username && $password) {
         $usersDirPath = realpath(dirname(__FILE__).'/users');
         $userFiles = array_filter(glob($usersDirPath.'/*'), 'is_file');
 
@@ -76,7 +77,7 @@ function checkLogin()
             $usersInDir[$usernameFilename] = $content;
         }
 
-        if (!isset($usersInDir[$username]) || $usersInDir[$username] != $password) {
+        if (!isset($usersInDir[$username]) || $usersInDir[$username] != $_POST['password']) {
             echo json_encode(['status' => 0, 'msg' => 'Invalid credentials']);
             exit;
         }
@@ -109,6 +110,8 @@ function dismissNginxReload()
 
 function getHomeStats()
 {
+    needsUserLogin();
+
     if (
         !isset($_SESSION['homeStatsLastBuilt']) ||
         !isset($_SESSION['homeStats']) ||
@@ -128,6 +131,8 @@ function getHomeStats()
 
 function recheckHomeStats()
 {
+    needsUserLogin();
+
     $_SESSION['homeStatsLastBuilt'] = time();
     $_SESSION['homeStats'] = statsBuilder();
 
@@ -139,13 +144,68 @@ function recheckHomeStats()
 }
 
 
+function reloadService()
+{
+    needsUserLogin();
+
+    if (!empty($_POST['svcname'])) {
+        $svcname = $_POST['svcname'];
+
+        $reloadAllowedServices = ['nginx'];
+
+        if (in_array($svcname, $reloadAllowedServices)) {
+            $reload = `systemctl reload {$svcname} 2>&1`;
+
+            if (isset($_SESSION['need_nginx_reload'])) {
+                unset($_SESSION['need_nginx_reload']);
+            }
+        }
+
+        echo json_encode(['status' => 1, 'msg' => 'Reload status: '.$reload]);
+        exit;
+    } else {
+        echo json_encode(['status' => 0, 'msg' => 'Service name parameter missing']);
+        exit;
+    }
+}
+
+
+function restartService()
+{
+    needsUserLogin();
+
+    if (!empty($_POST['svcname'])) {
+        $svcname = $_POST['svcname'];
+
+        $restartAllowedServices = [
+            'nginx', 'httpd', 'postfix', 'dovecot', 'vsftpd', 'proftpd', 'ssh', 'mysql',
+            'php-fpm', 'php5.6-fpm', 'php7.0-fpm', 'php7.1-fpm', 'php7.2-fpm', 'php7.3-fpm', 'php7.4-fpm'
+        ];
+
+        if (in_array($svcname, $restartAllowedServices)) {
+            $restart = `systemctl restart {$svcname} 2>&1`;
+
+            if (isset($_SESSION['need_nginx_reload'])) {
+                unset($_SESSION['need_nginx_reload']);
+            }
+        }
+
+        echo json_encode(['status' => 1, 'msg' => 'Restart status: '.$restart]);
+        exit;
+    } else {
+        echo json_encode(['status' => 0, 'msg' => 'Service name parameter missing']);
+        exit;
+    }
+}
+
+
 function disableDomain()
 {
     needsUserLogin();
 
-    if ($fname = $_POST['fname']) {
+    if (!empty($_POST['fname'])) {
+        $filename = base64_decode($_POST['fname']);
 
-        $filename = base64_decode($fname);
         if (NGM_CONF_STYLE == 'source') {
             $filePath = NGM_CONFDIR_SOURCE.sanitize($filename);
             $newFilePath = rtrim($filePath, '.conf').'.disabled';
@@ -179,9 +239,9 @@ function enableDomain()
 {
     needsUserLogin();
 
-    if ($fname = $_POST['fname']) {
+    if (!empty($_POST['fname'])) {
+        $filename = base64_decode($_POST['fname']);
 
-        $filename = base64_decode($fname);
         if (NGM_CONF_STYLE == 'source') {
             $filePath = NGM_CONFDIR_SOURCE.sanitize($filename);
             $newFilePath = rtrim($filePath, '.disabled').'.conf';
@@ -216,12 +276,9 @@ function createDomain()
 {
     needsUserLogin();
 
-    $filename = $_POST['new_domain_name'];
-    $templateName = $_POST['new_domain_template'];
+    if (!empty($_POST['new_domain_name'])) {
+        $fileNameFull = sanitize($_POST['new_domain_name']).'.conf';
 
-    if ($filename) {
-
-        $fileNameFull = sanitize($filename).'.conf';
         if (NGM_CONF_STYLE == 'source') {
             $filePath = NGM_CONFDIR_SOURCE.$fileNameFull;
         } elseif (NGM_CONF_STYLE == 'apache') {
@@ -234,8 +291,8 @@ function createDomain()
             exit;
         }
 
-        if ($templateName) {
-            $templatePath = realpath('templates').'/'.sanitize($templateName);
+        if (!empty($_POST['new_domain_template'])) {
+            $templatePath = realpath('templates').'/'.sanitize($_POST['new_domain_template']);
             $templateContent = file_get_contents($templatePath);
         } else {
             $templateContent = '';
@@ -268,12 +325,9 @@ function changeConfContent()
 {
     needsUserLogin();
 
-    $fname = $_POST['fname'];
-    $newContent = $_POST['conf_content'];
+    if (!empty($_POST['fname']) && !empty($_POST['conf_content'])) {
+        $filename = base64_decode($_POST['fname']);
 
-    if ($fname && $newContent) {
-
-        $filename = base64_decode($fname);
         if (NGM_CONF_STYLE == 'source') {
             $filePath = NGM_CONFDIR_SOURCE.sanitize($filename);
         } elseif (NGM_CONF_STYLE == 'apache') {
@@ -286,7 +340,7 @@ function changeConfContent()
         }
 
         // remove BOM bytes if content contains
-        $newContent = str_replace("\xEF\xBB\xBF", '', $newContent);
+        $newContent = str_replace("\xEF\xBB\xBF", '', $_POST['conf_content']);
 
         file_put_contents($filePath, $newContent);
 
@@ -305,9 +359,8 @@ function deleteTemplate()
 {
     needsUserLogin();
 
-    if ($fname = $_POST['fname']) {
-
-        $filename = base64_decode($fname);
+    if (!empty($_POST['fname'])) {
+        $filename = base64_decode($_POST['fname']);
         $filePath = realpath('templates').'/'.sanitize($filename);
 
         if (!is_file($filePath)) {
@@ -330,12 +383,8 @@ function createTemplate()
 {
     needsUserLogin();
 
-    $newName = $_POST['new_template_name'];
-    $newContent = $_POST['new_template_content'];
-
-    if ($newName && $newContent) {
-
-        $filename = rtrim($newName, '.stub');
+    if (!empty($_POST['new_template_name']) && !empty($_POST['new_template_content'])) {
+        $filename = rtrim($_POST['new_template_name'], '.stub');
         $filePath = realpath('templates').'/'.sanitize($filename);
 
         if (is_file($filePath)) {
@@ -344,7 +393,7 @@ function createTemplate()
         }
 
         // remove BOM bytes if content contains
-        $newContent = str_replace("\xEF\xBB\xBF", '', $newContent);
+        $newContent = str_replace("\xEF\xBB\xBF", '', $_POST['new_template_content']);
 
         file_put_contents($filePath.'.stub', $newContent);
 
@@ -362,12 +411,8 @@ function changeTemplateContent()
 {
     needsUserLogin();
 
-    $fname = $_POST['fname'];
-    $newContent = $_POST['template_content'];
-
-    if ($fname && $newContent) {
-
-        $filename = base64_decode($fname);
+    if (!empty($_POST['fname']) && !empty($_POST['template_content'])) {
+        $filename = base64_decode($_POST['fname']);
         $filePath = realpath('templates').'/'.sanitize($filename);
 
         if (!is_file($filePath)) {
@@ -376,7 +421,7 @@ function changeTemplateContent()
         }
 
         // remove BOM bytes if content contains
-        $newContent = str_replace("\xEF\xBB\xBF", '', $newContent);
+        $newContent = str_replace("\xEF\xBB\xBF", '', $_POST['template_content']);
 
         file_put_contents($filePath, $newContent);
 
@@ -393,12 +438,8 @@ function changeMainConfigContent()
 {
     needsUserLogin();
 
-    $fname = $_POST['fname'];
-    $newContent = $_POST['main_config_content'];
-
-    if ($fname && $newContent) {
-
-        $filename = base64_decode($fname);
+    if (!empty($_POST['fname']) && !empty($_POST['main_config_content'])) {
+        $filename = base64_decode($_POST['fname']);
         $filePath = NGM_CONFDIR_MAIN.sanitize($filename);
 
         if (!is_file($filePath)) {
@@ -407,7 +448,7 @@ function changeMainConfigContent()
         }
 
         // remove BOM bytes if content contains
-        $newContent = str_replace("\xEF\xBB\xBF", '', $newContent);
+        $newContent = str_replace("\xEF\xBB\xBF", '', $_POST['main_config_content']);
 
         file_put_contents($filePath, $newContent);
 

@@ -31,8 +31,8 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link nginx_reload"><i class="fa fa-redo"></i> Reload</a>
-                            <a href="javascript:;" class="card-link nginx_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link nginx_reload reload-service" data-svcname="nginx"><i class="fa fa-redo"></i> Reload</a>
+                            <a href="javascript:;" class="card-link nginx_restart restart-service" data-svcname="nginx"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link apache_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link apache_restart restart-service" data-svcname="httpd"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -72,7 +72,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link postfix_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link postfix_restart restart-service" data-svcname="postfix"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link dovecot_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link dovecot_restart restart-service" data-svcname="dovecot"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link vsftpd_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link vsftpd_restart restart-service" data-svcname="vsftpd"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link proftpd_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link proftpd_restart restart-service" data-svcname="proftpd"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -152,7 +152,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link ssh_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link ssh_restart restart-service" data-svcname="ssh"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -172,7 +172,7 @@ $pageBody .= '
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link mysql_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link mysql_restart restart-service" data-svcname="mysql"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>
@@ -204,7 +204,7 @@ foreach (NGM_PHP_VERS as $phpVer) {
                         </div>
 
                         <div class="col-md-12">
-                            <a href="javascript:;" class="card-link php'.$verConverted.'_restart"><i class="fa fa-sync-alt"></i> Restart</a>
+                            <a href="javascript:;" class="card-link php'.$verConverted.'_restart restart-service" data-svcname="php'.$phpVer.'-fpm"><i class="fa fa-sync-alt"></i> Restart</a>
                         </div>
                     </div>
                 </div>

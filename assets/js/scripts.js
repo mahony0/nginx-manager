@@ -185,6 +185,46 @@ jQuery(function($) {
             getStatsForHome(true);
         });
 
+        $(".reload-service").click(function() {
+            let svcname = $(this).data("svcname");
+
+            Swal.fire({
+                title: 'Reload "' + svcname + '" Service',
+                text: "Are you sure you want to reload this service?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, reload it!'
+            }).then((result) => {
+                if (result.value) {
+                    $.post("/ajax.php", {section: 'reload-service', svcname: svcname}, function(response) {
+                        swalResponse(response, 1);
+                    });
+                }
+            })
+        });
+
+        $(".restart-service").click(function() {
+            let svcname = $(this).data("svcname");
+
+            Swal.fire({
+                title: 'Restart "' + svcname + '" Service',
+                text: "Are you sure you want to restart this service?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, restart it!'
+            }).then((result) => {
+                if (result.value) {
+                    $.post("/ajax.php", {section: 'restart-service', svcname: svcname}, function(response) {
+                        swalResponse(response, 1);
+                    });
+                }
+            })
+        });
+
     } else if (activePageSlug === "domains") {
         // domains page
 
