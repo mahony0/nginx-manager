@@ -1,0 +1,124 @@
+# redirect all http traffic to https
+server {
+    listen 80;
+    listen [::]:80 ipv6only=on;
+    server_name domain.tld www.domain.tld;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2 ipv6only=on;
+    server_name domain.tld www.domain.tld;
+
+    # use self-signed cert for cloudflare
+    include snippets/self-signed.conf;
+    include snippets/ssl-params.conf;
+
+    # dirs
+    root /var/www/domain.tld/html;
+    index index.html index.php;
+    access_log /var/www/domain.tld/logs/nginx.access.log;
+    error_log /var/www/domain.tld/logs/nginx.error.log info;
+
+    # don't send the nginx version number in error pages and Server header
+    proxy_read_timeout 300;
+    proxy_pass_header Server;
+    server_tokens off;
+
+    # Basic CSP Configurations
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+
+    # active this rule if you want to enable HSTS
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+    charset utf-8;
+
+    # gzip
+    gzip            on;
+    gzip_disable    "msie6";
+    gzip_vary       on;
+    gzip_proxied    any;
+    gzip_comp_level 6;
+    gzip_buffers    16 8k;
+    gzip_min_length 1000;
+    gzip_types      application/javascript application/json application/rss+xml application/xml+rss application/vnd.ms-fontobject application/x-font application/x-font-opentype application/x-font-otf application/x-font-truetype application/x-font-ttf application/x-javascript application/xhtml+xml application/xml font/opentype font/otf font/ttf image/svg+xml image/x-icon text/css text/javascript text/plain text/xml text/x-js;
+
+    # assets expire
+    location ~* \.(jpg|png|gif|jpeg|webp|css|mp3|wav|swf|mov|doc|pdf|xls|ppt|docx|pptx|xlsx)$ {
+        expires max;
+    }
+
+    # block access to all dot files and folders except .well-known
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    # error pages
+    error_page 500 /error_docs/500.html;
+    location = /error_docs/500.html { internal; }
+    error_page 501 /error_docs/501.html;
+    location = /error_docs/501.html { internal; }
+    error_page 502 /error_docs/502.html;
+    location = /error_docs/502.html { internal; }
+    error_page 503 /error_docs/503.html;
+    location = /error_docs/503.html { internal; }
+
+    location / {
+        # Let OctoberCMS handle everything by default.
+        # The path not resolved by OctoberCMS router will return OctoberCMS's 404 page.
+        # Everything that does not match with the whitelist below will fall into this.
+        rewrite ^/.*$ /index.php last;
+    }
+
+    # Pass the PHP scripts to FastCGI server
+    location ~ ^/index.php {
+        # Mitigate https://httpoxy.org/ vulnerabilities
+        fastcgi_param   HTTP_PROXY  "";
+
+        fastcgi_pass    unix:/var/run/php/php7.4-fpm.sock;
+        include         fastcgi_params;
+    }
+
+    # Whitelist
+    ## Let October handle if static file not exists
+    location ~ ^/favicon\.ico { try_files $uri /index.php; }
+    location ~ ^/sitemap\.xml { try_files $uri /index.php; }
+    location ~ ^/robots\.txt { try_files $uri /index.php; }
+    location ~ ^/humans\.txt { try_files $uri /index.php; }
+
+    ## Let nginx return 404 if static file not exists
+    location ~ ^/storage/app/uploads/public { try_files $uri 404; }
+    location ~ ^/storage/app/media { try_files $uri 404; }
+    location ~ ^/storage/temp/public { try_files $uri 404; }
+
+    location ~ ^/modules/.*/assets { try_files $uri 404; }
+    location ~ ^/modules/.*/resources { try_files $uri 404; }
+    location ~ ^/modules/.*/behaviors/.*/assets { try_files $uri 404; }
+    location ~ ^/modules/.*/behaviors/.*/resources { try_files $uri 404; }
+    location ~ ^/modules/.*/widgets/.*/assets { try_files $uri 404; }
+    location ~ ^/modules/.*/widgets/.*/resources { try_files $uri 404; }
+    location ~ ^/modules/.*/formwidgets/.*/assets { try_files $uri 404; }
+    location ~ ^/modules/.*/formwidgets/.*/resources { try_files $uri 404; }
+    location ~ ^/modules/.*/reportwidgets/.*/assets { try_files $uri 404; }
+    location ~ ^/modules/.*/reportwidgets/.*/resources { try_files $uri 404; }
+
+    location ~ ^/plugins/.*/.*/assets { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/resources { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/behaviors/.*/assets { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/behaviors/.*/resources { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/reportwidgets/.*/assets { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/reportwidgets/.*/resources { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/formwidgets/.*/assets { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/formwidgets/.*/resources { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/widgets/.*/assets { try_files $uri 404; }
+    location ~ ^/plugins/.*/.*/widgets/.*/resources { try_files $uri 404; }
+
+    location ~ ^/themes/.*/assets { try_files $uri 404; }
+    location ~ ^/themes/.*/resources { try_files $uri 404; }
+}
