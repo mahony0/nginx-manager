@@ -135,7 +135,7 @@ function statsBuilder()
     /*
      * vsftpd
      */
-    $vsftpdV = shell_exec('vsftpd -v 2>&1 | head -n 1');
+    $vsftpdV = shell_exec('vsftpd -v 0>&1 | head -n 1');
     $vsftpdV = is_array($vsftpdV) ? trim(first($vsftpdV)) : trim($vsftpdV);
     $vsftpdStatus = `systemctl is-active vsftpd.service`;
     $results['vsftpd_ver'] = $vsftpdV;
@@ -184,7 +184,7 @@ function statsBuilder()
 
         $phpV = shell_exec('php'.$phpVer.' -v 2>&1 | head -n 1');
         $phpV = is_array($phpV) ? trim(first($phpV)) : trim($phpV);
-        $phpStatus = `systemctl is-active php{$phpVer}.service`;
+        $phpStatus = `systemctl is-active php{$phpVer}-fpm.service`;
         $results['php'.$verConverted.'_ver'] = $phpV;
         $results['php'.$verConverted.'_installed'] = ($phpV && !stringContains($phpV, $negativeStatus)) ? 1 : 0;
         $results['php'.$verConverted.'_line'] = ($phpV && !stringContains($phpV, $negativeStatus)) ? 'v'.trim(get_string_between($phpV, 'PHP ', ' (')) : '<i class="text-warning">Not installed</i>';
