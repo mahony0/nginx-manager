@@ -96,7 +96,7 @@ function statsBuilder()
     $results['nginx_ver'] = $nginxV;
     $results['nginx_installed'] = ($nginxV && !stringContains($nginxV, $negativeStatus)) ? 1 : 0;
     $results['nginx_line'] = ($nginxV && !stringContains($nginxV, $negativeStatus)) ? 'v'.(end(explode('/', $nginxV))) : '<i class="text-warning">Not installed</i>';
-    $results['nginx_status'] = $nginxStatus == 'active' ? 1 : 0;
+    $results['nginx_status'] = $nginxStatus == trim('active') ? 1 : 0;
 
     /*
      * apache
@@ -106,7 +106,7 @@ function statsBuilder()
     $results['apache_ver'] = $apacheV;
     $results['apache_installed'] = ($apacheV && !stringContains($apacheV, $negativeStatus)) ? 1 : 0;
     $results['apache_line'] = ($apacheV && !stringContains($apacheV, $negativeStatus)) ? 'v'.trim(get_string_between($apacheV, '/', '(')) : '<i class="text-warning">Not installed</i>';
-    $results['apache_status'] = $apacheStatus == 'active' ? 1 : 0;
+    $results['apache_status'] = $apacheStatus == trim('active') ? 1 : 0;
 
     /*
      * postfix
@@ -116,7 +116,7 @@ function statsBuilder()
     $results['postfix_ver'] = $postfixV;
     $results['postfix_installed'] = ($postfixV && !stringContains($postfixV, $negativeStatus)) ? 1 : 0;
     $results['postfix_line'] = ($postfixV && !stringContains($postfixV, $negativeStatus)) ? 'v'.trim(explode('=', $postfixV)[1]) : '<i class="text-warning">Not installed</i>';
-    $results['postfix_status'] = $postfixStatus == 'active' ? 1 : 0;
+    $results['postfix_status'] = $postfixStatus == trim('active') ? 1 : 0;
 
     /*
      * dovecot
@@ -126,7 +126,7 @@ function statsBuilder()
     $results['dovecot_ver'] = $dovecotV;
     $results['dovecot_installed'] = ($dovecotV && !stringContains($dovecotV, $negativeStatus)) ? 1 : 0;
     $results['dovecot_line'] = ($dovecotV && !stringContains($dovecotV, $negativeStatus)) ? 'v'.trim(explode('(', $dovecotV)[0]) : '<i class="text-warning">Not installed</i>';
-    $results['dovecot_status'] = $dovecotStatus == 'active' ? 1 : 0;
+    $results['dovecot_status'] = $dovecotStatus == trim('active') ? 1 : 0;
 
     /*
      * vsftpd
@@ -136,7 +136,7 @@ function statsBuilder()
     $results['vsftpd_ver'] = $vsftpdV;
     $results['vsftpd_installed'] = ($vsftpdV && !stringContains($vsftpdV, $negativeStatus)) ? 1 : 0;
     $results['vsftpd_line'] = ($vsftpdV && !stringContains($vsftpdV, $negativeStatus)) ? 'v'.trim(explode('version', $vsftpdV)[1]) : '<i class="text-warning">Not installed</i>';
-    $results['vsftpd_status'] = $vsftpdStatus == 'active' ? 1 : 0;
+    $results['vsftpd_status'] = $vsftpdStatus == trim('active') ? 1 : 0;
 
     /*
      * proftpd
@@ -146,7 +146,7 @@ function statsBuilder()
     $results['proftpd_ver'] = $proftpdV;
     $results['proftpd_installed'] = ($proftpdV && !stringContains($proftpdV, $negativeStatus)) ? 1 : 0;
     $results['proftpd_line'] = ($proftpdV && !stringContains($proftpdV, $negativeStatus)) ? 'v'.trim(explode('Version', $proftpdV)[1]) : '<i class="text-warning">Not installed</i>';
-    $results['proftpd_status'] = $proftpdStatus == 'active' ? 1 : 0;
+    $results['proftpd_status'] = $proftpdStatus == trim('active') ? 1 : 0;
 
     /*
      * ssh
@@ -156,7 +156,7 @@ function statsBuilder()
     $results['ssh_ver'] = is_array($sshV) ? first($sshV) : $sshV;
     $results['ssh_installed'] = ($sshV && !stringContains($sshV, $negativeStatus)) ? 1 : 0;
     $results['ssh_line'] = ($sshV && !stringContains($sshV, $negativeStatus)) ? 'v'.trim(get_string_between($sshV, 'OpenSSH_', ',')) : '<i class="text-warning">Not installed</i>';
-    $results['ssh_status'] = $sshStatus == 'active' ? 1 : 0;
+    $results['ssh_status'] = $sshStatus == trim('active') ? 1 : 0;
 
     /*
      * mysql
@@ -166,7 +166,7 @@ function statsBuilder()
     $results['mysql_ver'] = $mysqlV;
     $results['mysql_installed'] = ($mysqlV && !stringContains($mysqlV, $negativeStatus)) ? 1 : 0;
     $results['mysql_line'] = ($mysqlV && !stringContains($mysqlV, $negativeStatus)) ? 'v'.trim(get_string_between($mysqlV, 'Distrib', ',')) : '<i class="text-warning">Not installed</i>';
-    $results['mysql_status'] = $mysqlStatus == 'active' ? 1 : 0;
+    $results['mysql_status'] = $mysqlStatus == trim('active') ? 1 : 0;
 
     /*
      * PHPs
@@ -179,7 +179,7 @@ function statsBuilder()
         $results['php'.$verConverted.'_ver'] = $phpV;
         $results['php'.$verConverted.'_installed'] = ($phpV && !stringContains($phpV, $negativeStatus)) ? 1 : 0;
         $results['php'.$verConverted.'_line'] = ($phpV && !stringContains($phpV, $negativeStatus)) ? 'v'.trim(get_string_between($phpV, 'PHP ', ' (')) : '<i class="text-warning">Not installed</i>';
-        $results['php'.$verConverted.'_status'] = $phpStatus == 'active' ? 1 : 0;
+        $results['php'.$verConverted.'_status'] = $phpStatus == trim('active') ? 1 : 0;
     }
 
     return $results;
