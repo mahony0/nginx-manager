@@ -69,7 +69,7 @@ php -S domain.tld:50100 -c /opt/nginx-manager/php.ini -t /opt/nginx-manager/
 ## Screenshots
 
 ### Dashboard
-![Dashboard](https://uxms.net/storage/app/media/github/1-dash.jpg)
+![Dashboard](https://uxms.net/storage/app/media/github/1-dash-v2.jpg)
 
 ### Main Configurations
 ![Main Configurations](https://uxms.net/storage/app/media/github/2-configs.jpg)
