@@ -92,6 +92,7 @@ function statsBuilder()
      * nginx
      */
     $nginxV = `nginx -v 2>&1`;
+    $nginxV = is_array($nginxV) ? trim(first($nginxV)) : trim($nginxV);
     $nginxStatus = `systemctl is-active nginx.service`;
     $results['nginx_ver'] = $nginxV;
     $results['nginx_installed'] = ($nginxV && !stringContains($nginxV, $negativeStatus)) ? 1 : 0;
@@ -102,6 +103,7 @@ function statsBuilder()
      * apache
      */
     $apacheV = `httpd -v 2>&1`;
+    $apacheV = is_array($apacheV) ? trim(first($apacheV)) : trim($apacheV);
     $apacheStatus = `systemctl is-active httpd.service`;
     $results['apache_ver'] = $apacheV;
     $results['apache_installed'] = ($apacheV && !stringContains($apacheV, $negativeStatus)) ? 1 : 0;
@@ -112,6 +114,7 @@ function statsBuilder()
      * postfix
      */
     $postfixV = `postconf -d | grep mail_version\ = 2>&1`;
+    $postfixV = is_array($postfixV) ? trim(first($postfixV)) : trim($postfixV);
     $postfixStatus = `systemctl is-active postfix.service`;
     $results['postfix_ver'] = $postfixV;
     $results['postfix_installed'] = ($postfixV && !stringContains($postfixV, $negativeStatus)) ? 1 : 0;
@@ -122,6 +125,7 @@ function statsBuilder()
      * dovecot
      */
     $dovecotV = `dovecot --version 2>&1`;
+    $dovecotV = is_array($dovecotV) ? trim(first($dovecotV)) : trim($dovecotV);
     $dovecotStatus = `systemctl is-active dovecot.service`;
     $results['dovecot_ver'] = $dovecotV;
     $results['dovecot_installed'] = ($dovecotV && !stringContains($dovecotV, $negativeStatus)) ? 1 : 0;
@@ -132,6 +136,7 @@ function statsBuilder()
      * vsftpd
      */
     $vsftpdV = `vsftpd -v 2>&1`;
+    $vsftpdV = is_array($vsftpdV) ? trim(first($vsftpdV)) : trim($vsftpdV);
     $vsftpdStatus = `systemctl is-active vsftpd.service`;
     $results['vsftpd_ver'] = $vsftpdV;
     $results['vsftpd_installed'] = ($vsftpdV && !stringContains($vsftpdV, $negativeStatus)) ? 1 : 0;
@@ -142,6 +147,7 @@ function statsBuilder()
      * proftpd
      */
     $proftpdV = `proftpd --version 2>&1`;
+    $proftpdV = is_array($proftpdV) ? trim(first($proftpdV)) : trim($proftpdV);
     $proftpdStatus = `systemctl is-active proftpd.service`;
     $results['proftpd_ver'] = $proftpdV;
     $results['proftpd_installed'] = ($proftpdV && !stringContains($proftpdV, $negativeStatus)) ? 1 : 0;
@@ -152,8 +158,9 @@ function statsBuilder()
      * ssh
      */
     $sshV = `ssh -V 2>&1`;
+    $sshV = is_array($sshV) ? trim(first($sshV)) : trim($sshV);
     $sshStatus = `systemctl is-active ssh.service`;
-    $results['ssh_ver'] = is_array($sshV) ? first($sshV) : $sshV;
+    $results['ssh_ver'] = $sshV;
     $results['ssh_installed'] = ($sshV && !stringContains($sshV, $negativeStatus)) ? 1 : 0;
     $results['ssh_line'] = ($sshV && !stringContains($sshV, $negativeStatus)) ? 'v'.trim(get_string_between($sshV, 'OpenSSH_', ',')) : '<i class="text-warning">Not installed</i>';
     $results['ssh_status'] = trim($sshStatus) == 'active' ? 1 : 0;
@@ -162,6 +169,7 @@ function statsBuilder()
      * mysql
      */
     $mysqlV = `mysql -V 2>&1`;
+    $mysqlV = is_array($mysqlV) ? trim(first($mysqlV)) : trim($mysqlV);
     $mysqlStatus = `systemctl is-active mysql.service`;
     $results['mysql_ver'] = $mysqlV;
     $results['mysql_installed'] = ($mysqlV && !stringContains($mysqlV, $negativeStatus)) ? 1 : 0;
@@ -175,6 +183,7 @@ function statsBuilder()
         $verConverted = str_replace('.', '', $phpVer);
 
         $phpV = `php{$phpVer} -v`;
+        $phpV = is_array($phpV) ? trim(first($phpV)) : trim($phpV);
         $phpStatus = `systemctl is-active php{$phpVer}.service`;
         $results['php'.$verConverted.'_ver'] = $phpV;
         $results['php'.$verConverted.'_installed'] = ($phpV && !stringContains($phpV, $negativeStatus)) ? 1 : 0;
