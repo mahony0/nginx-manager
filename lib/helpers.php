@@ -91,7 +91,7 @@ function statsBuilder()
     /*
      * nginx
      */
-    $nginxV = `nginx -v 2>&1`;
+    $nginxV = shell_exec('nginx -v 2>&1 | head -n 1');
     $nginxV = is_array($nginxV) ? trim(first($nginxV)) : trim($nginxV);
     $nginxStatus = `systemctl is-active nginx.service`;
     $results['nginx_ver'] = $nginxV;
@@ -102,7 +102,7 @@ function statsBuilder()
     /*
      * apache
      */
-    $apacheV = `httpd -v 2>&1`;
+    $apacheV = shell_exec('httpd -v 2>&1 | head -n 1');
     $apacheV = is_array($apacheV) ? trim(first($apacheV)) : trim($apacheV);
     $apacheStatus = `systemctl is-active httpd.service`;
     $results['apache_ver'] = $apacheV;
@@ -113,7 +113,7 @@ function statsBuilder()
     /*
      * postfix
      */
-    $postfixV = `postconf -d | grep mail_version\ = 2>&1`;
+    $postfixV = shell_exec('postconf -d | grep mail_version\ = 2>&1 | head -n 1');
     $postfixV = is_array($postfixV) ? trim(first($postfixV)) : trim($postfixV);
     $postfixStatus = `systemctl is-active postfix.service`;
     $results['postfix_ver'] = $postfixV;
@@ -124,7 +124,7 @@ function statsBuilder()
     /*
      * dovecot
      */
-    $dovecotV = `dovecot --version 2>&1`;
+    $dovecotV = shell_exec('dovecot --version 2>&1 | head -n 1');
     $dovecotV = is_array($dovecotV) ? trim(first($dovecotV)) : trim($dovecotV);
     $dovecotStatus = `systemctl is-active dovecot.service`;
     $results['dovecot_ver'] = $dovecotV;
@@ -135,7 +135,7 @@ function statsBuilder()
     /*
      * vsftpd
      */
-    $vsftpdV = `vsftpd -v 2>&1`;
+    $vsftpdV = shell_exec('vsftpd -v 2>&1 | head -n 1');
     $vsftpdV = is_array($vsftpdV) ? trim(first($vsftpdV)) : trim($vsftpdV);
     $vsftpdStatus = `systemctl is-active vsftpd.service`;
     $results['vsftpd_ver'] = $vsftpdV;
@@ -146,7 +146,7 @@ function statsBuilder()
     /*
      * proftpd
      */
-    $proftpdV = `proftpd --version 2>&1`;
+    $proftpdV = shell_exec('proftpd --version 2>&1 | head -n 1');
     $proftpdV = is_array($proftpdV) ? trim(first($proftpdV)) : trim($proftpdV);
     $proftpdStatus = `systemctl is-active proftpd.service`;
     $results['proftpd_ver'] = $proftpdV;
@@ -157,7 +157,7 @@ function statsBuilder()
     /*
      * ssh
      */
-    $sshV = `ssh -V 2>&1`;
+    $sshV = shell_exec('ssh -V 2>&1 | head -n 1');
     $sshV = is_array($sshV) ? trim(first($sshV)) : trim($sshV);
     $sshStatus = `systemctl is-active ssh.service`;
     $results['ssh_ver'] = $sshV;
@@ -168,7 +168,7 @@ function statsBuilder()
     /*
      * mysql
      */
-    $mysqlV = `mysql -V 2>&1`;
+    $mysqlV = shell_exec('mysql -V 2>&1 | head -n 1');
     $mysqlV = is_array($mysqlV) ? trim(first($mysqlV)) : trim($mysqlV);
     $mysqlStatus = `systemctl is-active mysql.service`;
     $results['mysql_ver'] = $mysqlV;
@@ -182,7 +182,7 @@ function statsBuilder()
     foreach (NGM_PHP_VERS as $phpVer) {
         $verConverted = str_replace('.', '', $phpVer);
 
-        $phpV = `php{$phpVer} -v`;
+        $phpV = shell_exec('php'.$phpVer.' -v 2>&1 | head -n 1');
         $phpV = is_array($phpV) ? trim(first($phpV)) : trim($phpV);
         $phpStatus = `systemctl is-active php{$phpVer}.service`;
         $results['php'.$verConverted.'_ver'] = $phpV;
