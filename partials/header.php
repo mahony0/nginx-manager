@@ -36,7 +36,7 @@ $header = '<!doctype html>
 
         .rounded-pulse.medium-pulse, .rounded-pulse.medium-pulse:before {width: 30px; height: 30px;}
 
-        .card {min-height: 118px;}
+        .card {min-height: 125px;}
         .card-footer h5 {display: inline-block;}
 
         .navbar-brand span {vertical-align: middle;}

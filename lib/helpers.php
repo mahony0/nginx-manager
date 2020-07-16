@@ -1,5 +1,18 @@
 <?php
 
+function isUserpathTraversing($basepath, $pathToCheck) {
+    $realBase = realpath($basepath);
+    $realUserPath = realpath($basepath.$pathToCheck);
+
+    if ($realUserPath === false || strpos($realUserPath, $realBase) !== 0) {
+        // Directory Traversal!
+        return true;
+    } else {
+        // Good path!
+        return false;
+    }
+}
+
 /**
  * https://github.com/vito/chyrp/blob/35c646dda657300b345a233ab10eaca7ccd4ec10/includes/helpers.php#L515
  * function: sanitize

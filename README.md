@@ -55,6 +55,12 @@ both commands output password for you to save securely.
 php -S domain.tld:50100 -c /opt/nginx-manager/php.ini -t /opt/nginx-manager/
 ```
 
+> for getting updated version of the script
+
+```bash
+cd /opt/nginx-manager && git pull origin master
+```
+
 
 ## Tasks for v1 Release
 
